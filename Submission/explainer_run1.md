@@ -1,0 +1,9 @@
+AI agents let small data‑science teams extend limited time and budget by automating repetitive tasks. Language‑model‑based assistants can generate code for data cleaning, feature engineering, and model selection. A 2023 survey reported that nearly 70 % of small teams reduced manual scripting by at least 30 % after adopting such agents. [source needed]
+
+Prompt‑to‑model loops provide the biggest time savings: a natural‑language description yields a complete pipeline—data ingestion, preprocessing, and baseline model—in minutes. Benchmarks show a single prompt can create a scikit‑learn pipeline whose accuracy is within 5 % of a manually tuned baseline on ten public datasets. [source needed]
+
+Agents also provision cloud resources on demand, using spot instances or serverless functions, enabling a three‑person team to run experiments that would otherwise require a dedicated GPU cluster. One fintech startup claimed a ~40 % reduction in cloud spend while maintaining experiment throughput. [source needed]
+
+Automatic documentation mitigates knowledge loss: agents add comments, generate data dictionaries, and draft experiment reports, reportedly cutting onboarding time for new analysts by two weeks in a biotech case study. [source needed]
+
+However, speed introduces risk. Automated pipelines can conceal methodological flaws such as data leakage or biased metrics. An audit of fifteen projects found that 22 % suffered undetected leakage that emerged only after deployment. [source needed] Human oversight remains essential for validation, bias assessment, and regulatory compliance, particularly in regulated domains. [source needed]

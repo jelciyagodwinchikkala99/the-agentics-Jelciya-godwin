@@ -1,0 +1,40 @@
+CrewAI Build Report
+
+Name: Jelciya Godwin 
+Topic I used: How small teams can use AI agents in data science
+
+1. What I changed
+
+I edited main.py (my copy is main_changed.py), in the writer Agent definition. I replaced its goal and backstory and kept the role as “Technical Writer”. The goal is now “Explain to a CFO who cares about costs, risks, and decisions”. The backstory now says the writer briefs a time-pressed chief financial officer, leads with the bottom line, uses business comparisons like investment, risk, and return, avoids scientific jargon, and keeps every sentence short. [Add the original goal/backstory wording here.]
+
+I chose the writer because it is the only agent that decides how the explainer sounds. The researcher gathers facts and the editor only tightens. Changing the audience in one place lets me see whether a persona edit alone shifts tone and framing. I left the tasks, the crew, the model (openai/gpt-oss-120b on Groq, temperature 0.3), and the topic untouched, so the writer’s persona is the one thing I deliberately changed.
+
+2. How CrewAI works
+
+CrewAI splits a project into three kinds of objects. An agent is a role-playing worker defined by a role, goal, and backstory, plus the LLM it uses. A task says what work gets done: a description, an expected_output, and the agent that owns it. A crew assembles the agents and tasks and runs them with a Process. Here I used Process.sequential, so research_task runs first, its output is handed to writing_task, and that output goes to editing_task.
+
+The role, goal, and backstory are put into the prompt for every LLM call that agent makes. That is why my edit worked. The writer’s task text (“write a 250-word explainer on {topic}”) did not change, but the persona wrapped around it did. The {topic} placeholder is filled by crew.kickoff(inputs={"topic": topic}). The research brief reaches the writer automatically through the sequential process. The CFO persona therefore only reshaped how the writer turned the same kind of brief into prose. The editor then received a draft that was already cost-framed and applied its own job, tightening and adding [source needed] flags.
+
+3. Evidence
+
+How the runs differ. Run 1 (explainer_run1.md, baseline) is 219 words in five prose paragraphs. It opens with a general benefit (“extend limited time and budget”), and its second and fifth paragraphs stay on technical detail (prompt-to-model loops, data leakage). It has 6 [source needed] flags. Run 2 (the CFO version) is about 256 words, a one-line bottom line followed by five bold-labelled bullets: Speed gains, Lowered skill barrier, Reproducibility, Cost-effective scaling, and Residual risk. Its business framing is explicit. It compares agent cost ($150–$400 a month) with a junior engineer’s salary, and it ends on “keep expenses low, and manage the remaining risk”. It has 5 flags.
+
+Caveat. The researcher also re-ran and produced different facts each time (temperature 0.3). Some of the difference comes from the brief, not only from my persona change.
+
+What surprised me. The “avoid jargon, short sentences” instruction was only partly followed. Run 2 still uses “CI-style testing”, “data-drift alerts”, “pipeline drift”, and “Git-backed repository”, and several sentences are long.
+
+What went wrong. Earlier I ran python main.py "your topic", copying the example literally. CrewAI filled {topic} with the words “your topic”. All three agents asked me what the topic was, and the saved explainer.md was just a request for a topic. When I repeated it, the researcher invented “AI in healthcare” and the writer and editor built on that without question. I fixed it by running with no argument, so the default topic in main.py was used. One run also logged “Invalid response from LLM call – None or empty” and CrewAI retried automatically.
+
+4. Choosing a framework
+
+I would pick CrewAI for this project because the work is a fixed assembly line: research, then write, then edit. CrewAI’s agent/task/crew vocabulary maps directly onto that, and Process.sequential handles passing output between steps with almost no code. Changing the writer’s behavior took a few lines in one Agent definition.
+
+The Agents SDK kit from class works differently. Its Triage agent hands off to specialists (Math Tutor, Writing Coach, Translator), and the model decides who gets the request. That would be easier for a routing problem, such as one chat interface for many request types. It would be harder here, because I want every request to pass through all three roles in order, and hand-offs leave that to the model.
+
+LangGraph would be easier if I wanted a loop or a tool. The graph in class (agent, tools, and an edge back to the agent) made tool use visible, and conditional edges would let me send a draft back to the writer when the editor flags too many unsupported claims. My crew has no tools, so I can’t check a single fact it states. It would also be harder for the simple linear case, since I would have to define nodes, edges, and state myself.
+
+5. Verification and AI use
+
+Checking the output. The kit has no web access, so every figure comes from the model’s memory and I treated all of them as unverified. First, I confirmed the editor flagged them: run 1 has 6 [source needed] flags and run 2 has 5. Second, I traced numbers from the researcher’s brief into the final text. The brief cited a “2023 survey of 312 groups” and a “NeurIPS 2023 paper”, but I could not confirm either, and the writer dropped those specifics. Third, I did sanity checks. For example, “22% of fifteen projects” cannot be a real count, because 3 of 15 is 20% and 4 of 15 is 26.7%. That suggests the figure is invented. I would not cite any of these numbers without finding a real source.
+
+AI use. I used Claude to compare my two output files and draft this report from my terminal log and main_changed.py. [Edit to match what you did: say whether AI also helped write or debug the code change.] I checked the report against my own files, including the word counts, the flag counts, and the first-run failure.
